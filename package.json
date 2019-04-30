@@ -7,6 +7,7 @@
         "build": "tsc",
         "test": "jest",
         "start": "tsc && node .",
+        "doc": "tsc && typedoc --out ./docs --name ts-telnet",
         "postinstall": "tsc"
     },
     "types": "src/index.ts",
@@ -16,7 +17,8 @@
         "@types/jest": "^24.0.11",
         "jest": "^24.7.1",
         "ts-jest": "^24.0.2",
-        "tslint": "^5.16.0"
+        "tslint": "^5.16.0",
+        "typedoc": "^0.14.2"
     },
     "dependencies": {
         "@types/node": "^11.13.8",
