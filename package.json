@@ -7,7 +7,7 @@
         "build": "tsc",
         "test": "jest",
         "start": "tsc && node .",
-        "doc": "tsc && typedoc --out ./docs --name ts-telnet",
+        "doc": "tsc && typedoc ./src",
         "postinstall": "tsc"
     },
     "types": "src/index.ts",
