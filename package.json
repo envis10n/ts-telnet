@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "description": "A telnet server for TypeScript.",
     "main": "dist/index.js",
+    "typings": "src/index.ts",
     "scripts": {
         "build": "tsc",
         "test": "jest",
