@@ -1,14 +1,13 @@
 {
     "name": "ts-telnet",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "A telnet server for TypeScript.",
     "main": "dist/index.js",
     "scripts": {
         "build": "tsc",
         "test": "jest",
         "start": "tsc && node .",
-        "doc": "tsc && typedoc ./src",
-        "postinstall": "tsc"
+        "doc": "tsc && typedoc ./src"
     },
     "types": "src/index.ts",
     "author": "envis10n",

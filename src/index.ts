@@ -48,7 +48,7 @@ enum Options {
     LM = 34,
     EV = 36,
     SLE = 45,
-    ATCP = 201
+    GMCP = 201
 }
 
 interface IACResult {
@@ -94,7 +94,7 @@ namespace Telnet {
         private buffer: Buffer = Buffer.alloc(0);
         private callback: Option<(data: Buffer) => void> = null;
         private prompt: string = "> ";
-        public atcp: boolean = false;
+        public GMCP: boolean = false;
         constructor(private socket: net.Socket, public defaultPrompt: string = "> ") {
             super();
             this.prompt = this.defaultPrompt;
@@ -148,18 +148,18 @@ namespace Telnet {
                 this.emit("close", had_error);
             });
             this.on("will", (opt) => {
-                if (opt === Options.ATCP) {
-                    this.atcp = true;
-                    this.do(Options.ATCP);
+                if (opt === Options.GMCP) {
+                    this.GMCP = true;
+                    this.do(Options.GMCP);
                 }
             });
             this.on("wont", (opt) => {
-                if (opt === Options.ATCP) {
-                    this.atcp = false;
+                if (opt === Options.GMCP) {
+                    this.GMCP = false;
                 }
             });
             this.on("sb", (opt, val, data: Buffer) => {
-                if (opt === Options.ATCP) {
+                if (opt === Options.GMCP) {
                     const d = data.toString().split(" ");
                     const call: string = d[0];
                     const json: string = d.slice(1).join(" ");
@@ -198,7 +198,7 @@ namespace Telnet {
                     }
                 }
             });
-            this.will(Options.ATCP);
+            this.will(Options.GMCP);
         }
         public ask(prompt: string, mask: boolean = false): Promise<string> {
             return new Promise((resolve, reject) => {
