@@ -3,93 +3,92 @@ import tls from "tls";
 import { EventEmitter as EE } from "events";
 import { uint8 } from "./buf_util";
 
-type Option<T> = T | null;
-
-enum NVT {
-    NUL = 0,
-    LF = 10,
-    CR = 13,
-    BEL = 7,
-    BS = 8,
-    HT = 9,
-    VT = 11,
-    FF = 12
-}
-
-enum Commands {
-    SE = 240,
-    NOP = 241,
-    DM = 242,
-    BRK = 243,
-    IP = 244,
-    AO = 245,
-    AYT = 246,
-    EC = 247,
-    EL = 248,
-    GA = 249,
-    SB = 250,
-    WILL = 251,
-    WONT = 252,
-    DO = 253,
-    DONT = 254,
-    IAC = 255
-}
-
-enum Options {
-    TB = 0,
-    ECHO = 1,
-    SGA = 3,
-    STATUS = 5,
-    TM = 6,
-    TT = 24,
-    WS = 31,
-    TS = 32,
-    RFC = 33,
-    LM = 34,
-    EV = 36,
-    SLE = 45,
-    GMCP = 201
-}
-
-interface IACResult {
-    iac: Buffer[];
-    chunk: Buffer;
-}
-
-function findIAC(chunk: Buffer): IACResult {
-    const res: Buffer[] = [];
-    let i = chunk.findIndex((v) => v === Commands.IAC);
-    while (i !== -1) {
-        const iv = chunk.findIndex((v) => v === Commands.SE);
-        if (iv !== -1 && chunk[i + 1] === Commands.SB) {
-            const b = Buffer.alloc(iv + 1 - i);
-            chunk.copy(b, 0, i, iv + 1);
-            const c1 = chunk.subarray(0, i);
-            const c2 = chunk.subarray(iv + 1);
-            chunk = Buffer.concat([c1, c2]);
-            res.push(b);
-        } else {
-            const b = Buffer.alloc(3);
-            chunk.copy(b, 0, i, i + 3);
-            const c1 = chunk.subarray(0, i);
-            const c2 = chunk.subarray(i + 3);
-            chunk = Buffer.concat([c1, c2]);
-            res.push(b);
-        }
-        i = chunk.findIndex((v) => v === Commands.IAC);
-    }
-    return {
-        iac: res,
-        chunk,
-    };
-}
-
-function findLF(chunk: Buffer) {
-    const f = chunk.toString().split("\n").filter((v) => v !== "");
-    return f.map((v) => Buffer.from(v));
-}
-
 namespace Telnet {
+    type Option<T> = T | null;
+
+    export enum NVT {
+        NUL = 0,
+        LF = 10,
+        CR = 13,
+        BEL = 7,
+        BS = 8,
+        HT = 9,
+        VT = 11,
+        FF = 12
+    }
+
+    export enum Commands {
+        SE = 240,
+        NOP = 241,
+        DM = 242,
+        BRK = 243,
+        IP = 244,
+        AO = 245,
+        AYT = 246,
+        EC = 247,
+        EL = 248,
+        GA = 249,
+        SB = 250,
+        WILL = 251,
+        WONT = 252,
+        DO = 253,
+        DONT = 254,
+        IAC = 255
+    }
+
+    export enum Options {
+        TB = 0,
+        ECHO = 1,
+        SGA = 3,
+        STATUS = 5,
+        TM = 6,
+        TT = 24,
+        WS = 31,
+        TS = 32,
+        RFC = 33,
+        LM = 34,
+        EV = 36,
+        SLE = 45,
+        GMCP = 201
+    }
+
+    interface IACResult {
+        iac: Buffer[];
+        chunk: Buffer;
+    }
+
+    function findIAC(chunk: Buffer): IACResult {
+        const res: Buffer[] = [];
+        let i = chunk.findIndex((v) => v === Commands.IAC);
+        while (i !== -1) {
+            const iv = chunk.findIndex((v) => v === Commands.SE);
+            if (iv !== -1 && chunk[i + 1] === Commands.SB) {
+                const b = Buffer.alloc(iv + 1 - i);
+                chunk.copy(b, 0, i, iv + 1);
+                const c1 = chunk.subarray(0, i);
+                const c2 = chunk.subarray(iv + 1);
+                chunk = Buffer.concat([c1, c2]);
+                res.push(b);
+            } else {
+                const b = Buffer.alloc(3);
+                chunk.copy(b, 0, i, i + 3);
+                const c1 = chunk.subarray(0, i);
+                const c2 = chunk.subarray(i + 3);
+                chunk = Buffer.concat([c1, c2]);
+                res.push(b);
+            }
+            i = chunk.findIndex((v) => v === Commands.IAC);
+        }
+        return {
+            iac: res,
+            chunk,
+        };
+    }
+
+    function findLF(chunk: Buffer) {
+        const f = chunk.toString().split("\n").filter((v) => v !== "");
+        return f.map((v) => Buffer.from(v));
+    }
     export class Client extends EE {
         private buffer: Buffer = Buffer.alloc(0);
         private callback: Option<(data: Buffer) => void> = null;
